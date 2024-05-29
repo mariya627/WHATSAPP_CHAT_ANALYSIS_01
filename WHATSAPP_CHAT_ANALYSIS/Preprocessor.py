@@ -92,6 +92,7 @@ def preprocess(data):
         else:
             period.append(str(hour) + "-" + str(hour + 1))
     df['period'] = period
+    df = df.drop(df.index[0])
     return df
 
 
