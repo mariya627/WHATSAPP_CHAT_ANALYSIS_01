@@ -34,39 +34,139 @@ def most_busy_users(df):
         columns={'index': 'name', 'user': 'percent'})
     return x,df
 
-def create_wordcloud(selected_user,df):
+def create_wordcloud(selected_user, df):
+        stop_words = [
+            "the", "a", "to", "and", "is", "in", "it", "you", "that", "this",
+            "was", "for", "on", "with", "have", "from", "be", "by", "not", "are",
+            "at", "as", "your", "all", "have", "new", "more", "an", "was", "we",
+            "will", "home", "can", "up", "what", "time", "there", "day", "if",
+            "they", "we", "out", "some", "when", "who", "get", "one", "her", "him",
+            "has", "had", "she", "which", "do", "their", "said", "or", "has", "my",
+            "me", "him", "him", "his", "them", "then", "so", "would", "about",
+            "get", "just", "how", "been", "other", "some", "its", "like", "only",
+            "other", "our", "two", "make", "them", "see", "use", "into", "very",
+            "after", "back", "also", "good", "well", "way", "even", "any", "these",
+            "most", "many", "some", "such", "were", "here", "him", "because",
+            "before", "being", "below", "between", "both", "but", "by", "can",
+            "did", "does", "doing", "down", "during", "each", "few", "for", "from",
+            "further", "had", "has", "have", "having", "he", "he'd", "he'll",
+            "he's", "her", "here", "here's", "hers", "herself", "him", "himself",
+            "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in",
+            "into", "is", "it", "it's", "its", "itself", "let's", "me", "more",
+            "most", "my", "myself", "nor", "of", "on", "once", "only", "or",
+            "other", "ought", "our", "ours", "ourselves", "out", "over", "own",
+            "same", "she", "she'd", "she'll", "she's", "should", "so", "some",
+            "such", "than", "that", "that's", "the", "their", "theirs", "them",
+            "themselves", "then", "there", "there's", "these", "they", "they'd",
+            "they'll", "they're", "they've", "this", "those", "through", "to",
+            "too", "under", "until", "up", "very", "was", "we", "we'd", "we'll",
+            "we're", "we've", "were", "what", "what's", "when", "when's", "where",
+            "where's", "which", "while", "who", "who's", "whom", "why", "why's",
+            "with", "would", "you", "you'd", "you'll", "you're", "you've", "your",
+            "yours", "yourself", "yourselves"
+        ]
 
-    f = open('stop_hinglish.txt', 'r')
-    stop_words = f.read()
+        if selected_user != 'Overall':
+            df = df[df['Usernames'] == selected_user]
 
+        temp = df[df['Usernames'] != 'group_notification']
+        temp = temp[temp['Messages'] != '<Media omitted>\n']
+
+        # Rest of the function code
+
+
+        # Rest of the function code
+
+
+def remove_stop_words(message):
+    stop_words = [
+        "the", "a", "to", "and", "is", "in", "it", "you", "that", "this",
+        "was", "for", "on", "with", "have", "from", "be", "by", "not", "are",
+        "at", "as", "your", "all", "have", "new", "more", "an", "was", "we",
+        "will", "home", "can", "up", "what", "time", "there", "day", "if",
+        "they", "we", "out", "some", "when", "who", "get", "one", "her", "him",
+        "has", "had", "she", "which", "do", "their", "said", "or", "has", "my",
+        "me", "him", "him", "his", "them", "then", "so", "would", "about",
+        "get", "just", "how", "been", "other", "some", "its", "like", "only",
+        "other", "our", "two", "make", "them", "see", "use", "into", "very",
+        "after", "back", "also", "good", "well", "way", "even", "any", "these",
+        "most", "many", "some", "such", "were", "here", "him", "because",
+        "before", "being", "below", "between", "both", "but", "by", "can",
+        "did", "does", "doing", "down", "during", "each", "few", "for", "from",
+        "further", "had", "has", "have", "having", "he", "he'd", "he'll",
+        "he's", "her", "here", "here's", "hers", "herself", "him", "himself",
+        "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in",
+        "into", "is", "it", "it's", "its", "itself", "let's", "me", "more",
+        "most", "my", "myself", "nor", "of", "on", "once", "only", "or",
+        "other", "ought", "our", "ours", "ourselves", "out", "over", "own",
+        "same", "she", "she'd", "she'll", "she's", "should", "so", "some",
+        "such", "than", "that", "that's", "the", "their", "theirs", "them",
+        "themselves", "then", "there", "there's", "these", "they", "they'd",
+        "they'll", "they're", "they've", "this", "those", "through", "to",
+        "too", "under", "until", "up", "very", "was", "we", "we'd", "we'll",
+        "we're", "we've", "were", "what", "what's", "when", "when's", "where",
+        "where's", "which", "while", "who", "who's", "whom", "why", "why's",
+        "with", "would", "you", "you'd", "you'll", "you're", "you've", "your",
+        "yours", "yourself", "yourselves"
+    ]
+
+    y = []
+    for word in message.lower().split():
+        if word not in stop_words:
+            y.append(word)
+    return " ".join(y)
+
+
+def create_wordcloud(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['Usernames'] == selected_user]
 
     temp = df[df['Usernames'] != 'group_notification']
     temp = temp[temp['Messages'] != '<Media omitted>\n']
 
-    def remove_stop_words(message):
-        y = []
-        for word in message.lower().split():
-            if word not in stop_words:
-                y.append(word)
-        return " ".join(y)
-
-    wc = WordCloud(width=500,height=500,min_font_size=10,background_color='white')
+    wc = WordCloud(width=500, height=500, min_font_size=10, background_color='white')
     temp['Messages'] = temp['Messages'].apply(remove_stop_words)
     df_wc = wc.generate(temp['Messages'].str.cat(sep=" "))
     return df_wc
 
-def most_common_words(selected_user,df):
 
-    f = open('stop_hinglish.txt','r')
-    stop_words = f.read()
-
+def most_common_words(selected_user, df):
     if selected_user != 'Overall':
         df = df[df['Usernames'] == selected_user]
 
     temp = df[df['Usernames'] != 'group_notification']
     temp = temp[temp['Messages'] != '<Media omitted>\n']
+
+    stop_words = [
+        "the", "a", "to", "and", "is", "in", "it", "you", "that", "this",
+        "was", "for", "on", "with", "have", "from", "be", "by", "not", "are",
+        "at", "as", "your", "all", "have", "new", "more", "an", "was", "we",
+        "will", "home", "can", "up", "what", "time", "there", "day", "if",
+        "they", "we", "out", "some", "when", "who", "get", "one", "her", "him",
+        "has", "had", "she", "which", "do", "their", "said", "or", "has", "my",
+        "me", "him", "him", "his", "them", "then", "so", "would", "about",
+        "get", "just", "how", "been", "other", "some", "its", "like", "only",
+        "other", "our", "two", "make", "them", "see", "use", "into", "very",
+        "after", "back", "also", "good", "well", "way", "even", "any", "these",
+        "most", "many", "some", "such", "were", "here", "him", "because",
+        "before", "being", "below", "between", "both", "but", "by", "can",
+        "did", "does", "doing", "down", "during", "each", "few", "for", "from",
+        "further", "had", "has", "have", "having", "he", "he'd", "he'll",
+        "he's", "her", "here", "here's", "hers", "herself", "him", "himself",
+        "his", "how", "how's", "i", "i'd", "i'll", "i'm", "i've", "if", "in",
+        "into", "is", "it", "it's", "its", "itself", "let's", "me", "more",
+        "most", "my", "myself", "nor", "of", "on", "once", "only", "or",
+        "other", "ought", "our", "ours", "ourselves", "out", "over", "own",
+        "same", "she", "she'd", "she'll", "she's", "should", "so", "some",
+        "such", "than", "that", "that's", "the", "their", "theirs", "them",
+        "themselves", "then", "there", "there's", "these", "they", "they'd",
+        "they'll", "they're", "they've", "this", "those", "through", "to",
+        "too", "under", "until", "up", "very", "was", "we", "we'd", "we'll",
+        "we're", "we've", "were", "what", "what's", "when", "when's", "where",
+        "where's", "which", "while", "who", "who's", "whom", "why", "why's",
+        "with", "would", "you", "you'd", "you'll", "you're", "you've", "your",
+        "yours", "yourself", "yourselves"
+    ]
 
     words = []
 
