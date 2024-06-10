@@ -43,8 +43,6 @@ if uploaded_file is not None:
         'Bhutto changed the group name from "Shik shak shook" to "sheikh ki 5 biwiyaan"',
         "Bhutto changed this group's icon",'Mahagula changed the group name from "........... KI CHUSS" to "Barirah phupho ban gyi 💃"',
 
-
-        # Add more messages to remove as needed
     ]
 
     # Remove multiple messages from the list
