@@ -6,7 +6,7 @@ import os
 import speech_recognition as sr
 import numpy as np
 import soundfile as sf
-
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from googletrans import Translator
 def preprocess(data):
     messages = []
@@ -125,53 +125,48 @@ def preprocess_data(data):
     data = pd.DataFrame(data)
     return data
 
-# def main():
-#     st.title('Whatsapp Chat Media ANalysis')
-#
-#     # Upload zip file
-#     zip_file = st.file_uploader('Upload a zip file', type='zip')
-#
-#     if zip_file:
-#         # Unzip the uploaded zip file
-#         unzip_folder(zip_file)
-#
-#         # List all media files in the unzipped folder
-#         media_files = [f for f in os.listdir('unzipped_folder') if os.path.isfile(os.path.join('unzipped_folder', f))]
-#
-#         # Display dropdown menu with media file options
-#         selected_media = st.selectbox('Select a media file', media_files)
-#
-#         # Display the selected media file
-#         if selected_media:
-#             media_path = os.path.join('unzipped_folder', selected_media)
-#             if media_path.endswith(('.jpg', '.jpeg', '.png', '.gif')):
-#                 st.image(media_path)
-#             elif media_path.endswith(('.mp4', '.avi', '.mov')):
-#                 st.video(media_path)
-#             elif media_path.endswith(('.mp3', '.ogg', '.opus')):
-#                 st.audio(media_path, format='audio/ogg')
-#             elif media_path.endswith('.pdf'):
-#                 st.download_button(
-#                     label='Download PDF',
-#                     data=open(media_path, 'rb'),
-#                     file_name=selected_media,
-#                     mime='application/pdf',
-#                 )
-#             elif media_path.endswith(('.doc', '.docx')):
-#                 st.download_button(
-#                     label='Download Document',
-#                     data=open(media_path, 'rb'),
-#                     file_name=selected_media,
-#                     mime='application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-#                 )
-#             else:
-#                 st.write(f'File type not supported: {selected_media}')
-#
-# def unzip_folder(zip_file):
-#     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
-#         zip_ref.extractall('unzipped_folder')
+def analyze_top_active_days(data, selected_user=None):
 
+  # Group messages by date and count them
+  if selected_user is None:
+    message_counts = data.groupby('Only_date')['Messages'].count()
+  else:
+    # Filter data for selected user before grouping
+    user_data = data[data['Usernames'] == selected_user]
+    message_counts = user_data.groupby('Only_date')['Messages'].count()
 
+  # Check if any messages exist
+  if message_counts.empty:
+    return None
+
+  # Sort message counts by descending order (most active days first)
+  top_5_days = message_counts.sort_values(ascending=False).head(5)
+
+  return top_5_days
+
+def perform_sentiment_analysis(data):
+    analyzer = SentimentIntensityAnalyzer()
+    data["sentiment"] = data["Messages"].apply(
+        lambda x: analyzer.polarity_scores(x)["compound"]
+    )
+    data["sentiment_label"] = data["sentiment"].apply(
+        lambda score:
+            "Positive"
+            if score >= 0.05
+            else ("Negative" if score <= -0.05 else "Neutral")
+    )
+    # Sentiment Distribution Pie Chart
+
+    return data
+
+def analyze_hourly_activity(df, selected_user):
+    # Filter the DataFrame for the selected user
+    user_data = df[df['Usernames'] == selected_user]
+
+    # Group by hour and count messages
+    hourly_message_counts = user_data.groupby(user_data['Date'].dt.hour)['Messages'].count().sort_values(ascending=False)
+
+    return hourly_message_counts
 def unzip_folder(zip_file):
     with zipfile.ZipFile(zip_file, 'r') as zip_ref:
         zip_ref.extractall('unzipped_folder')

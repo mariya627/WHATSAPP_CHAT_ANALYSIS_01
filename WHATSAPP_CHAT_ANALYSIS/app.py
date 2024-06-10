@@ -1,55 +1,13 @@
 import streamlit as st
-# import zipfile
 import Preprocessor,Utility
 import matplotlib.pyplot as plt
 import seaborn as sns
 import pyttsx3
 from googletrans import Translator, Translator
 from Preprocessor import main
-import os
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-def analyze_hourly_activity(df, selected_user):
-    # Filter the DataFrame for the selected user
-    user_data = df[df['Usernames'] == selected_user]
-
-    # Group by hour and count messages
-    hourly_message_counts = user_data.groupby(user_data['Date'].dt.hour)['Messages'].count().sort_values(ascending=False)
-
-    return hourly_message_counts
-
-def analyze_top_active_days(data, selected_user=None):
-
-  # Group messages by date and count them
-  if selected_user is None:
-    message_counts = data.groupby('Only_date')['Messages'].count()
-  else:
-    # Filter data for selected user before grouping
-    user_data = data[data['Usernames'] == selected_user]
-    message_counts = user_data.groupby('Only_date')['Messages'].count()
-
-  # Check if any messages exist
-  if message_counts.empty:
-    return None
-
-  # Sort message counts by descending order (most active days first)
-  top_5_days = message_counts.sort_values(ascending=False).head(5)
-
-  return top_5_days
-
-def perform_sentiment_analysis(data):
-    analyzer = SentimentIntensityAnalyzer()
-    data["sentiment"] = data["Messages"].apply(
-        lambda x: analyzer.polarity_scores(x)["compound"]
-    )
-    data["sentiment_label"] = data["sentiment"].apply(
-        lambda score:
-            "Positive"
-            if score >= 0.05
-            else ("Negative" if score <= -0.05 else "Neutral")
-    )
-    # Sentiment Distribution Pie Chart
-
-    return data
+from Preprocessor import analyze_hourly_activity
+from Preprocessor import analyze_top_active_days
+from Preprocessor import perform_sentiment_analysis
 
 st.sidebar.title("whatsapp chat analyzer")
 uploaded_file = st.sidebar.file_uploader("Choose a file")
@@ -59,9 +17,6 @@ if uploaded_file is not None:
     #st.text(data)
     df=Preprocessor.preprocess(data)
     data=Preprocessor.preprocess_data(data)
-
-
-
     st.dataframe(df)
     user_list = df['Usernames'].unique().tolist()
 
